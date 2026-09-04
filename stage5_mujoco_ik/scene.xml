@@ -1,0 +1,36 @@
+<mujoco model="scene">
+    <include file="jdcobot200.xml" />
+
+    <visual>
+        <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+        <rgba haze="0.15 0.25 0.35 1" />
+        <global azimuth="160" elevation="-20" />
+    </visual>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512"
+            height="3072" />
+        <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4"
+            rgb2="0.1 0.2 0.3"
+            markrgb="0.8 0.8 0.8" width="300" height="300" />
+        <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5"
+            reflectance="0.2" />
+    </asset>
+
+    <worldbody>
+       <light pos="0 0 3.5" dir="0 0 -1" directional="true" /> 
+        <geom name="floor" size="0 0 0.05" pos="0 0 0" type="plane" material="groundplane" />
+        <!-- Stage 6 빨간 블록: 바닥 접촉과 grasp 결합을 위한 자유 물체. -->
+        <!-- box half-height가 0.04이므로 중심 z=0.04에서 바닥 위에 놓인다. -->
+        <body name="red_block" pos="-0.250 0.000 0.040">
+            <freejoint name="red_block_freejoint" />
+            <geom name="red_block_geom" type="box" size="0.018 0.018 0.040"
+                  mass="0.02" rgba="0.9 0.05 0.05 1" contype="1" conaffinity="1" />
+        </body>
+    </worldbody>
+
+    <!-- grasp 전에는 비활성화하고, 접촉과 gripper 폐쇄 확인 후 runtime에서 켠다. -->
+    <equality>
+        <weld name="red_block_grasp" body1="gripper_assembly" body2="red_block" active="false" />
+    </equality>
+</mujoco>

@@ -1,0 +1,100 @@
+Stage 4 GLFW 렌더링 실행 안내
+============================
+
+1. 변경 내용
+------------
+
+Stage 4의 화면 출력을 mujoco.viewer 방식에서 GLFW 직접 렌더링 방식으로
+변경했습니다.
+
+현재 main.py는 다음 기능을 직접 처리합니다.
+
+- GLFW 창 생성
+- OpenGL context 생성
+- MuJoCo scene 업데이트 및 렌더링
+- 키보드와 마우스 입력 처리
+- 시뮬레이션 실시간 실행
+- 창 종료 시 GLFW 자원 정리
+
+또한 scene.xml에서 존재하지 않는 jdcobot200_1.xml을 참조하던 부분을 실제
+파일인 jdcobot200.xml을 참조하도록 수정했습니다.
+
+
+2. 기본 실행
+------------
+
+프로젝트 루트에서 다음 명령을 실행합니다.
+
+cd /home/robo/robot_harness
+python3 -m stage4_mujoco_dual_arm.main
+
+실행하면 "Stage 4 - Dual Arm MuJoCo" GLFW 창이 열립니다.
+
+
+3. 화면 조작
+------------
+
+- 왼쪽 마우스 드래그: 카메라 회전
+- 오른쪽 마우스 드래그: 카메라 이동
+- 마우스 휠: 확대 및 축소
+- ESC 키: 프로그램 종료
+- 창 닫기 버튼: 프로그램 종료
+
+
+4. 자동 종료 실행
+-----------------
+
+다음 명령은 GLFW 창을 열고 10초 후 자동으로 종료합니다.
+
+python3 -m stage4_mujoco_dual_arm.main --duration 10
+
+duration 값이 0이면 사용자가 ESC를 누르거나 창을 닫을 때까지 계속 실행됩니다.
+
+
+5. Headless 실행
+----------------
+
+화면을 열지 않고 물리 시뮬레이션과 상태 출력만 확인하려면 다음 명령을
+사용합니다.
+
+python3 -m stage4_mujoco_dual_arm.main --headless
+
+SSH 서버나 그래픽 디스플레이가 없는 환경에서는 이 방식을 사용할 수 있습니다.
+
+
+6. 관련 파일
+-------------
+
+- stage4_mujoco_dual_arm/main.py
+  GLFW 창, 렌더링 루프, 키보드 및 마우스 입력을 관리합니다.
+
+- stage4_mujoco_dual_arm/environment.py
+  MuJoCo 모델 로딩, 관절 명령, 물리 step 및 상태 조회를 담당합니다.
+
+- stage4_mujoco_dual_arm/scene.xml
+  바닥과 조명 등의 MuJoCo 장면을 정의하고 jdcobot200.xml을 포함합니다.
+
+- stage4_mujoco_dual_arm/jdcobot200.xml
+  로봇의 관절, actuator 및 STL mesh 구조를 정의합니다.
+
+
+7. 오류 해결
+-------------
+
+다음과 같은 오류가 발생하면 그래픽 디스플레이에 접근할 수 없는 상태일 수
+있습니다.
+
+GLFW 초기화 실패
+Failed to open display
+GLFW 창을 만들 수 없습니다
+
+데스크톱 GUI 터미널에서 다시 실행하거나 다음 headless 옵션을 사용합니다.
+
+python3 -m stage4_mujoco_dual_arm.main --headless
+
+
+8. 확인 결과
+-------------
+
+GLFW 창 생성, MuJoCo 렌더링, 시뮬레이션 실행 및 자동 종료가 정상적으로
+동작하는 것을 확인했습니다.

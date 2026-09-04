@@ -1,0 +1,370 @@
+로컬 LLM 로봇 Harness 대화 후속 정리
+====================================
+
+이 문서는 CONVERSATION_SUMMARY.txt를 작성한 이후 진행된 대화를 정리한 것이다.
+
+
+1. __repr__의 의미
+------------------
+
+확인한 코드:
+
+def __repr__(self):
+    return "SkillResult(success={!r}, message={!r}, data={!r})".format(
+        self.success, self.message, self.data
+    )
+
+__repr__은 Python 객체를 확인할 때 어떤 문자열로 보여줄지 정하는 특별한 함수다.
+
+__repr__이 없으면 객체를 출력할 때 다음처럼 메모리 주소 중심의 표현이 나올 수 있다.
+
+<common.skill_api.SkillResult object at 0x...>
+
+__repr__을 작성하면 다음처럼 객체 내부 값을 읽기 쉽게 표시할 수 있다.
+
+SkillResult(success=True, message='message printed', data={'text': 'hello'})
+
+현재 코드에서는 print(result)를 실행할 때 __str__이 별도로 없으므로 __repr__의
+결과가 사용된다.
+
+
+2. 문자열의 {!r} 의미
+---------------------
+
+다음 문자열에는 값을 넣을 위치가 세 군데 있다.
+
+"SkillResult(success={!r}, message={!r}, data={!r})"
+
+.format()에 전달한 값이 순서대로 각 {!r} 위치에 들어간다.
+
+첫 번째 {!r} : self.success
+두 번째 {!r} : self.message
+세 번째 {!r} : self.data
+
+!r은 해당 값을 repr() 방식으로 표현하라는 의미다.
+
+일반 문자열 표현:
+
+"{}".format("hello")
+
+결과:
+
+hello
+
+repr 표현:
+
+"{!r}".format("hello")
+
+결과:
+
+'hello'
+
+repr 표현은 문자열에 따옴표가 표시되므로 값의 자료형과 빈 문자열을 확인하기 쉽다.
+
+__repr__은 Harness 실행에 반드시 필요한 기능은 아니다. Stage 0을 더 단순하게
+학습하려면 __repr__을 제거하고 다음처럼 속성을 각각 출력해도 된다.
+
+print("Success:", result.success)
+print("Message:", result.message)
+print("Data:", result.data)
+
+
+3. MockPlanner의 Mock 의미
+-------------------------
+
+Mock은 영어의 "흉내 내는 것", "모조품"이라는 의미에서 온 개발 용어다.
+
+MockPlanner는 실제 llama.cpp와 Qwen3를 호출하지 않고, Qwen3가 반환할 법한 계획을
+미리 만들어 반환한다.
+
+실제 Planner의 흐름:
+
+사용자 명령
+→ llama.cpp에 HTTP 요청
+→ Qwen3 추론
+→ JSON 계획 반환
+
+MockPlanner의 흐름:
+
+사용자 명령
+→ 미리 정한 JSON 계획 반환
+
+MockPlanner의 장점:
+
+- llama.cpp가 꺼져 있어도 Harness를 시험할 수 있다.
+- Qwen 추론을 기다리지 않고 빠르게 실행할 수 있다.
+- LLM 문제와 Harness 문제를 분리해 확인할 수 있다.
+- 항상 같은 계획으로 반복 테스트할 수 있다.
+- 네트워크 오류와 무관하게 Skill을 테스트할 수 있다.
+
+엄밀한 테스트 용어로는 현재 MockPlanner가 미리 정해진 값을 반환하므로 Stub 또는
+Fake에 가까운 면도 있다. 교육용 이름으로는 ExamplePlanner 또는 FixedPlanner도
+사용할 수 있지만, 현재 프로젝트에서는 실제 LLM을 대신한다는 의미로 MockPlanner를
+사용하고 있다.
+
+Mock Planner 실행:
+
+python3 -m stage2_llm_harness.main
+
+실제 Qwen3 Planner 실행:
+
+python3 -m stage2_llm_harness.main --llm "PET 병을 왼팔로 잡고 오른팔로 뚜껑을 열어"
+
+
+4. Stage 2 모듈 실행 오류
+------------------------
+
+발생한 위치:
+
+/home/robo/robot_harness/stage2_llm_harness
+
+실행한 명령:
+
+python3 -m stage2_llm_harness.main --llm "PET 병을 왼팔로 잡고 오른팔로 뚜껑을 열어"
+
+오류:
+
+ModuleNotFoundError: No module named 'stage2_llm_harness'
+
+원인:
+
+python3 -m stage2_llm_harness.main은 현재 폴더 안의 main.py만 찾는 명령이 아니다.
+Python이 현재 검색 경로에서 stage2_llm_harness라는 패키지 폴더를 먼저 찾은 다음,
+그 안의 main 모듈을 찾는 명령이다.
+
+이미 stage2_llm_harness 폴더 안에 들어간 상태에서 이 명령을 사용하면 Python은
+실질적으로 다음과 같은 중첩 위치를 찾게 된다.
+
+stage2_llm_harness/stage2_llm_harness/main.py
+
+그런 폴더는 존재하지 않으므로 ModuleNotFoundError가 발생했다.
+
+
+5. 사용자가 변경한 Stage 2 import 확인
+---------------------------------------
+
+Stage 2 main.py의 import가 다음과 같은 직접 실행 방식으로 변경되어 있었다.
+
+from common.skill_api import SkillContext
+from symbolic_robot import ObjectState, SymbolicRobot, SymbolicWorld
+from skills import OpenCapSkill, PickSkill, PlaceSkill
+from harness import Harness, SkillRegistry, extract_json
+from llm_client import LocalLLMPlanner, MockPlanner
+
+이 import는 stage2_llm_harness 폴더에서 다음처럼 직접 실행할 때 자연스럽게 동작한다.
+
+python3 main.py
+
+하지만 프로젝트 루트에서 모듈 방식으로 실행할 때는 다음과 같은 패키지 경로가
+필요하다.
+
+from stage2_llm_harness.common.skill_api import SkillContext
+from stage2_llm_harness.symbolic_robot import ObjectState
+
+
+6. Stage 2의 두 가지 실행 방식 지원
+-------------------------------------
+
+사용자의 변경을 유지하면서 다음 두 실행 방식을 모두 지원하도록 import를 수정했다.
+
+try:
+    from stage2_llm_harness.common.skill_api import SkillContext
+    ...
+except ModuleNotFoundError:
+    from common.skill_api import SkillContext
+    ...
+
+같은 처리를 다음 파일에 적용했다.
+
+- stage2_llm_harness/main.py
+- stage2_llm_harness/harness.py
+- stage2_llm_harness/skills.py
+
+프로젝트 루트에서는 다음 명령을 사용한다.
+
+cd /home/robo/robot_harness
+python3 -m stage2_llm_harness.main --llm "PET 병을 왼팔로 잡고 오른팔로 뚜껑을 열어"
+
+Stage 2 폴더 안에서는 다음 명령을 사용한다.
+
+cd /home/robo/robot_harness/stage2_llm_harness
+python3 main.py --llm "PET 병을 왼팔로 잡고 오른팔로 뚜껑을 열어"
+
+정리:
+
+현재 폴더: /home/robo/robot_harness
+실행 방법: python3 -m stage2_llm_harness.main ...
+
+현재 폴더: /home/robo/robot_harness/stage2_llm_harness
+실행 방법: python3 main.py ...
+
+두 실행 방식의 Mock Planner 실행과 자동 테스트 5개가 모두 성공하는 것을 확인했다.
+
+
+7. LLM 메시지의 system과 user 역할
+-----------------------------------
+
+확인한 코드:
+
+messages = [
+    {"role": "system", "content": SYSTEM_PROMPT},
+    {
+        "role": "user",
+        "content": json.dumps(user_data, ensure_ascii=False, indent=2),
+    },
+]
+
+이 코드는 Qwen3에게 두 개의 메시지를 순서대로 전달한다.
+
+1) system 메시지
+2) user 메시지
+
+
+8. system 프롬프트
+------------------
+
+system 프롬프트는 LLM의 역할과 항상 지켜야 하는 규칙을 정한다.
+
+현재 SYSTEM_PROMPT의 주요 규칙:
+
+- 너는 로봇 작업 Planner다.
+- 모터를 직접 제어하지 않는다.
+- 설명 없이 JSON 리스트만 반환한다.
+- 허용된 Skill만 사용한다.
+- 정확한 Skill 인자 이름을 사용한다.
+- 현재 상태를 기준으로 계획한다.
+- 이미 끝난 작업을 반복하지 않는다.
+- object 인자에는 World의 정확한 객체 ID를 사용한다.
+
+즉 system 프롬프트는 다음 질문에 답한다.
+
+"LLM은 어떤 역할을 하고, 어떤 규칙을 지켜야 하는가?"
+
+
+9. user 프롬프트
+----------------
+
+user 프롬프트는 이번 요청에서 실제로 처리할 데이터를 전달한다.
+
+user_data의 구조:
+
+user_data = {
+    "allowed_skills": skills,
+    "current_state": state or {},
+    "previous_failure": feedback,
+    "user_command": command,
+}
+
+각 항목의 의미:
+
+allowed_skills    : 이번에 사용할 수 있는 Skill 목록과 인자
+current_state     : 현재 Robot과 World 상태
+previous_failure  : 이전 계획 또는 Skill의 실패 이유
+user_command      : 사용자가 로봇에게 내린 자연어 명령
+
+즉 user 프롬프트는 다음 질문에 답한다.
+
+"이번에는 어떤 상태에서 어떤 작업을 해야 하는가?"
+
+
+10. system과 user를 분리하는 이유
+---------------------------------
+
+system과 user의 역할은 서로 다르다.
+
+system : 고정된 역할, 규칙, 금지 사항, 출력 형식
+user   : 매 요청마다 달라지는 명령, Skill, 상태, 실패 정보
+
+전체 흐름:
+
+system
+"너는 로봇 Planner다. 허용된 Skill만 사용하고 JSON만 출력해라."
+
+→ user
+"현재 pet은 테이블에 있다. PET 병을 잡고 뚜껑을 열어라."
+
+→ assistant(Qwen3)
+[
+  {
+    "skill": "pick",
+    "args": {"arm": "left", "object": "pet"}
+  },
+  {
+    "skill": "open_cap",
+    "args": {
+      "holder_arm": "left",
+      "worker_arm": "right",
+      "object": "pet"
+    }
+  }
+]
+
+역할별로 분리하면 다음 장점이 있다.
+
+- 고정 규칙과 매번 달라지는 데이터를 구분할 수 있다.
+- 프롬프트를 읽고 수정하기 쉽다.
+- OpenAI-compatible API의 표준 메시지 구조를 따른다.
+- llama.cpp, Ollama, vLLM 등 다른 서버로 교체하기 쉽다.
+- 추후 대화 기록과 실패 피드백을 추가하기 쉽다.
+
+
+11. json.dumps의 역할
+---------------------
+
+user_data는 Python 딕셔너리다. 하지만 LLM 메시지의 content에는 문자열을 넣어야
+하므로 json.dumps()로 JSON 문자열로 변환한다.
+
+json.dumps(user_data, ensure_ascii=False, indent=2)
+
+ensure_ascii=False:
+
+한글을 \u... 형태로 바꾸지 않고 읽을 수 있는 한글로 유지한다.
+
+indent=2:
+
+JSON에 두 칸 들여쓰기를 적용하여 사람이 읽기 쉽게 만든다.
+
+예제 결과:
+
+{
+  "user_command": "PET 병의 뚜껑을 열어",
+  "previous_failure": null
+}
+
+
+12. 이번 후속 작업에서 수정된 파일
+-----------------------------------
+
+- stage2_llm_harness/main.py
+- stage2_llm_harness/harness.py
+- stage2_llm_harness/skills.py
+- CLI_TEST_GUIDE.md
+- CONVERSATION_SUMMARY_AFTER.txt
+
+
+13. 현재 권장 실행 명령
+----------------------
+
+가장 혼동이 적은 권장 방식은 항상 프로젝트 루트로 이동한 뒤 -m으로 실행하는 것이다.
+
+cd /home/robo/robot_harness
+
+Stage 0:
+
+python3 -m stage0_skill_api.main
+
+Stage 1:
+
+python3 -m stage1_symbolic_robot.main
+
+Stage 2 Mock Planner:
+
+python3 -m stage2_llm_harness.main
+
+Stage 2 실제 Qwen3:
+
+python3 -m stage2_llm_harness.main --llm "PET 병을 왼팔로 잡고 오른팔로 뚜껑을 열어"
+
+전체 자동 테스트:
+
+python3 -m unittest discover -v
