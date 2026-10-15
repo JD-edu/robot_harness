@@ -2,6 +2,13 @@
 
 CLI에서 단계별로 검증하는 방법은 [CLI_TEST_GUIDE.md](CLI_TEST_GUIDE.md)를 참고하세요.
 
+ROS 2 SLAM·Nav2 기반 자연어 이동, 테이블 미세 정렬과 후퇴는
+[SLAM Harness 안내](slam_harness/README.md)를 참고하세요.
+이 머신의 Qwen3 8B·llama.cpp 연결, 계획 확인과 자연어 이동 실행은
+[로컬 Qwen3 8B 사용법](slam_harness/README.md#로컬-qwen3-8b-사용-llamacpp)에 정리했습니다.
+테이블 월드와 ROS launch는 `ros2_ws/src/ros_dd_simulation`에 있으며,
+[월드 실행 방법](/home/robo/ros2_ws/src/ros_dd_simulation/ros_dd_harness_control.md)에 실행 명령을 정리했습니다.
+
 Symbolic 단계에서 하네스의 핵심 구조를 먼저 익히고, 실제 MuJoCo IK에 같은 구조를
 단계적으로 연결하는 교육용 프로젝트입니다.
 
