@@ -1,0 +1,20 @@
+# Example poses for a three-table survey started at the origin with yaw=0.
+# Verify these poses and the AMCL initial pose against each newly saved map.
+# target_point is the table edge reference; align is the desired base_footprint pose.
+frame_id: map
+landmarks:
+  table_1:
+    target_point: {x: 1.4, y: 1.5, yaw: 0.0}
+    approach: {x: 0.25, y: 1.5, yaw: 0.0}
+    align: {x: 0.85, y: 1.5, yaw: 0.0}
+    retreat: {x: -0.25, y: 1.5, yaw: 0.0}
+  table_2:
+    target_point: {x: 1.4, y: -1.5, yaw: 0.0}
+    approach: {x: 0.25, y: -1.5, yaw: 0.0}
+    align: {x: 0.85, y: -1.5, yaw: 0.0}
+    retreat: {x: -0.25, y: -1.5, yaw: 0.0}
+  table_3:
+    target_point: {x: -1.4, y: 1.5, yaw: 3.141592653589793}
+    approach: {x: -0.25, y: 1.5, yaw: 3.141592653589793}
+    align: {x: -0.85, y: 1.5, yaw: 3.141592653589793}
+    retreat: {x: 0.25, y: 1.5, yaw: 3.141592653589793}

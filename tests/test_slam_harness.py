@@ -3,7 +3,7 @@ import math
 from pathlib import Path
 import unittest
 from unittest.mock import patch
-from slam_harness_humble.core import Pose, Mission, LLMPlanner, control, load_registry, validate_plan
+from archvie.slam_harness_humble.core import Pose, Mission, LLMPlanner, control, load_registry, validate_plan
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -26,7 +26,7 @@ class FakeSkills:
 
 class HarnessTests(unittest.TestCase):
     def setUp(self):
-        self.registry = load_registry(ROOT/'slam_harness_humble/config/locations.yaml')
+        self.registry = load_registry(ROOT/'archvie/slam_harness_humble/config/locations.yaml')
 
     def test_entire_plan_validated_before_motion(self):
         skills = FakeSkills()
@@ -134,7 +134,7 @@ class HarnessTests(unittest.TestCase):
             with self.assertRaises(ValueError): Pose.parse(dict(x=x,y=0,yaw=0))
 
     def test_cli_keeps_ros_arguments_separate(self):
-        from slam_harness_humble.main import read_options
+        from archvie.slam_harness_humble.main import read_options
         options, ros_args=read_options(['1번으로 가','--alignment','skip',
                                        '--ros-args','-p','use_sim_time:=true'])
         self.assertEqual(options.command,'1번으로 가')

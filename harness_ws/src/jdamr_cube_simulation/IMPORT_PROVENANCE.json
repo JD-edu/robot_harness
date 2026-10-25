@@ -1,0 +1,43 @@
+{
+  "source_root": "bimanual-robot/src/navigation",
+  "selected_physical_bringup_model": "new_base_real.urdf",
+  "unchanged_imports": [
+    {
+      "source": "bimanual-robot/src/navigation/jdamr_cube_description/urdf/new_base_real.urdf",
+      "destination": "jdamr_cube_description/urdf/new_base_real.urdf",
+      "sha256": "36ede09f49bf621ee7e1ac38e81f33da70865eee48adde3d45bfcd7486ce147e"
+    },
+    {
+      "source": "bimanual-robot/src/navigation/jdamr_cube_description/config/new_base_geometry.yaml",
+      "destination": "jdamr_cube_description/config/new_base_geometry.yaml",
+      "sha256": "24dcb9422446ca4ed26defcad173bf069bfedc6613dc4bf83d37e220e2c3b139"
+    },
+    {
+      "source": "bimanual-robot/src/navigation/jdamr_cube_cartographer/config/jdamr_cube_2d_corridor.lua",
+      "destination": "jdamr_cube_cartographer/config/jdamr_cube_2d_corridor.lua",
+      "sha256": "1c3b6945e1f0815437b950aa1ec3b1e36dbbc9906ac9fec8c3d5c8f93caeb24a"
+    },
+    {
+      "source": "bimanual-robot/src/navigation/jdamr_cube_cartographer/config/jdamr_cube_2d.lua",
+      "destination": "jdamr_cube_cartographer/config/jdamr_cube_2d.lua",
+      "sha256": "6c0e833c8672ac48b56390b38cfeea88acf782add6c192d1b567435a5242148e"
+    },
+    {
+      "source": "bimanual-robot/src/navigation/jdamr_cube_cartographer/config/jdamr_cube_2d_real.lua",
+      "destination": "jdamr_cube_cartographer/config/jdamr_cube_2d_real.lua",
+      "sha256": "51d9ec30095bc32c42f0831d73719164f84579a24c105f446196e01c0a2e0b45"
+    },
+    {
+      "source": "bimanual-robot/src/navigation/jdamr_cube_navigation/config/new_base_nav2_params.yaml",
+      "destination": "jdamr_cube_harness/config/upstream_new_base_nav2.yaml",
+      "sha256": "b3c56753bab866bd006f125b0e147519660501087da3db4b627720ea513fc92e"
+    },
+    {
+      "source": "bimanual-robot/src/navigation/jdamr_cube_navigation/behavior_trees/navigate_to_pose_staging_navfn_mppi.xml",
+      "destination": "jdamr_cube_harness/behavior_trees/navigate_to_pose_staging_navfn_mppi.xml",
+      "sha256": "6231c006e0e7fafc9951e9d86d9e4f80567a10935b0faa69b4ae96a105a94a86"
+    }
+  ],
+  "shared_scene": "copied from harness_ws ros_dd_gazebo three_tables.world and table label meshes; robot is JDAMR",
+  "generated_sim_model": "new_base_real.urdf + simulated inertia/contact/sensors/DiffDrive; no arm or payload claims"
+}

@@ -1,0 +1,10 @@
+ROS 2 Jazzy / Gazebo Harmonic — see README.md for installation.
+
+1. ros2 launch ros_dd_gazebo ros_dd.launch.py
+2. For a saved map (Cartographer stopped):
+   ros2 launch ros_dd_navigation navigation.launch.py map:=$HOME/map.yaml
+3. Set initial pose in RViz, then send a navigation goal.
+
+For online SLAM, start Cartographer, then disable AMCL / map_server:
+ros2 launch ros_dd_cartographer ros_dd_cartograph.launch.py
+ros2 launch ros_dd_navigation navigation.launch.py use_localization:=false

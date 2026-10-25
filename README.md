@@ -2,12 +2,12 @@
 
 CLI에서 단계별로 검증하는 방법은 [CLI_TEST_GUIDE.md](CLI_TEST_GUIDE.md)를 참고하세요.
 
-ROS 2 SLAM·Nav2 기반 자연어 이동, 테이블 미세 정렬과 후퇴는
-[SLAM Harness 안내](slam_harness/README.md)를 참고하세요.
-이 머신의 Qwen3 8B·llama.cpp 연결, 계획 확인과 자연어 이동 실행은
-[로컬 Qwen3 8B 사용법](slam_harness/README.md#로컬-qwen3-8b-사용-llamacpp)에 정리했습니다.
-테이블 월드와 ROS launch는 `ros2_ws/src/ros_dd_simulation`에 있으며,
-[월드 실행 방법](/home/robo/ros2_ws/src/ros_dd_simulation/ros_dd_harness_control.md)에 실행 명령을 정리했습니다.
+ROS 2 Jazzy·Gazebo Harmonic의 three-table SLAM 하네스는
+[독립 harness_ws 실행 안내](harness_ws/README.md)를 참고하세요.
+하네스, 로봇 모델, Gazebo 월드, Cartographer, Nav2 설정이 `harness_ws/src`에 포함되어 있으며,
+외부 ROS 워크스페이스를 불러올 필요가 없습니다. 로컬 Qwen3 8B 서버를 그대로 사용합니다.
+
+이전 Humble 하네스는 [archvie/slam_harness_humble](archvie/slam_harness_humble/README.md)에 보관합니다.
 
 Symbolic 단계에서 하네스의 핵심 구조를 먼저 익히고, 실제 MuJoCo IK에 같은 구조를
 단계적으로 연결하는 교육용 프로젝트입니다.

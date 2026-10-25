@@ -6,9 +6,9 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from slam_harness_humble.core import Mission, Pose, load_registry, validate_plan
-from slam_harness_humble.llm_planner import LLMPlanner
-from slam_harness_humble.main import read_options, create_plan
+from archvie.slam_harness_humble.core import Mission, Pose, load_registry, validate_plan
+from archvie.slam_harness_humble.llm_planner import LLMPlanner
+from archvie.slam_harness_humble.main import read_options, create_plan
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -39,7 +39,7 @@ class Skills:
 
 class RecoveryPlans(unittest.TestCase):
     def setUp(self):
-        self.registry = load_registry(ROOT / 'slam_harness_humble/config/locations.yaml')
+        self.registry = load_registry(ROOT / 'archvie/slam_harness_humble/config/locations.yaml')
 
     def run_plan(self, spec, outcomes, backoffs=(), alignment='skip'):
         skills = Skills(outcomes, backoffs)

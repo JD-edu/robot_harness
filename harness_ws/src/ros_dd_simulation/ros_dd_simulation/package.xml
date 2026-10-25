@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>ros_dd_simulation</name>
+  <version>1.0.0</version>
+  <description>A metapackage containing all ros_dd packages (cartographer, gazebo, navigation, teleop).</description>
+  <maintainer email="your_email@example.com">Your Name</maintainer>
+  <license>Apache 2.0</license>
+  
+  <buildtool_depend>ament_cmake</buildtool_depend> 
+  
+  <exec_depend>ros_dd_cartographer</exec_depend>
+  <exec_depend>ros_dd_gazebo</exec_depend>
+  <exec_depend>ros_dd_navigation</exec_depend>
+  <exec_depend>ros_dd_teleop</exec_depend>
+  <exec_depend>ros_dd_nav2</exec_depend>
+  
+
+  
+  <export>
+    <build_type>ament_cmake</build_type>
+
+  </export>
+</package>

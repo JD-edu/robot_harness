@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>jdamr_cube_description</name><version>0.1.0</version>
+  <description>JDAMR Cube simulation adaptation of imported physical robot sources</description>
+  <maintainer email="jdedu@example.com">jdedu</maintainer>
+  <license>LicenseRef-Upstream-Unspecified</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

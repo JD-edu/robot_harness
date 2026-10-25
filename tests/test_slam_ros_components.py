@@ -9,8 +9,8 @@ try:
     from geometry_msgs.msg import Twist
     from sensor_msgs.msg import LaserScan
     from std_srvs.srv import SetBool
-    from slam_harness_humble.velocity_gate import VelocityGate
-    from slam_harness_humble.ros_backend import ROSSkills
+    from archvie.slam_harness_humble.velocity_gate import VelocityGate
+    from archvie.slam_harness_humble.ros_backend import ROSSkills
     ROS_AVAILABLE = True
 except ImportError:
     ROS_AVAILABLE = False
@@ -34,14 +34,14 @@ class ROSComponentTests(unittest.TestCase):
         return probe
 
     def test_backoff_uses_current_robot_heading(self):
-        from slam_harness_humble.locations import Pose
+        from archvie.slam_harness_humble.locations import Pose
         for yaw in (0., math.pi / 2, math.pi):
             calls = []
             p = NS(unsafe=False, active=None, retreat_timeout=40.,
                    pose=lambda: Pose(2., 3., yaw), stop=lambda: None,
                    fine_move=lambda target, timeout, reverse: calls.append((target, timeout, reverse)) or 'succeeded')
-            with patch('slam_harness_humble.ros_backend.rclpy.ok', return_value=True), \
-                 patch('slam_harness_humble.ros_backend.rclpy.spin_once'):
+            with patch('archvie.slam_harness_humble.ros_backend.rclpy.ok', return_value=True), \
+                 patch('archvie.slam_harness_humble.ros_backend.rclpy.spin_once'):
                 self.assertEqual(ROSSkills.backoff(p, 1.), 'succeeded')
             target, timeout, reverse = calls[0]
             self.assertAlmostEqual(target.x, 2 - math.cos(yaw))
@@ -60,8 +60,8 @@ class ROSComponentTests(unittest.TestCase):
     def test_backoff_missing_tf_never_moves(self):
         calls = []
         p = NS(unsafe=False, active=None, stop=lambda: calls.append('stop'))
-        with patch('slam_harness_humble.ros_backend.rclpy.ok', return_value=True), \
-             patch('slam_harness_humble.ros_backend.time.monotonic', side_effect=[0, 4]):
+        with patch('archvie.slam_harness_humble.ros_backend.rclpy.ok', return_value=True), \
+             patch('archvie.slam_harness_humble.ros_backend.time.monotonic', side_effect=[0, 4]):
             self.assertEqual(ROSSkills.backoff(p, 1.), 'unavailable')
 
     def test_scan_offset_is_transformed_to_robot_frame(self):
@@ -154,7 +154,7 @@ class ROSComponentTests(unittest.TestCase):
             with self.subTest(status=status,code=code):
                 future=NS(done=lambda:True,result=lambda:NS(status=status,result=NS(error_code=code)))
                 p=NS(nav_timeout=10,active=object())
-                with patch('slam_harness_humble.ros_backend.rclpy.ok',return_value=True):
+                with patch('archvie.slam_harness_humble.ros_backend.rclpy.ok',return_value=True):
                     self.assertEqual(ROSSkills.wait_for_navigation(p,future),expected)
                 self.assertIsNone(p.active)
 
@@ -162,9 +162,9 @@ class ROSComponentTests(unittest.TestCase):
         calls=[]
         p=NS(nav_timeout=1,last_progress_time=100,cancel=lambda:calls.append('cancel'))
         future=NS(done=lambda:False)
-        with patch('slam_harness_humble.ros_backend.rclpy.ok',return_value=True), \
-             patch('slam_harness_humble.ros_backend.rclpy.spin_once'), \
-             patch('slam_harness_humble.ros_backend.time.monotonic',side_effect=[0,2]):
+        with patch('archvie.slam_harness_humble.ros_backend.rclpy.ok',return_value=True), \
+             patch('archvie.slam_harness_humble.ros_backend.rclpy.spin_once'), \
+             patch('archvie.slam_harness_humble.ros_backend.time.monotonic',side_effect=[0,2]):
             self.assertEqual(ROSSkills.wait_for_navigation(p,future),'timeout')
         self.assertEqual(calls,['cancel'])
 
@@ -172,9 +172,9 @@ class ROSComponentTests(unittest.TestCase):
         calls=[]
         p=NS(nav_timeout=120,last_progress_time=0,cancel=lambda:calls.append('cancel'))
         future=NS(done=lambda:False)
-        with patch('slam_harness_humble.ros_backend.rclpy.ok',return_value=True), \
-             patch('slam_harness_humble.ros_backend.rclpy.spin_once'), \
-             patch('slam_harness_humble.ros_backend.time.monotonic',side_effect=[0,21,21]):
+        with patch('archvie.slam_harness_humble.ros_backend.rclpy.ok',return_value=True), \
+             patch('archvie.slam_harness_humble.ros_backend.rclpy.spin_once'), \
+             patch('archvie.slam_harness_humble.ros_backend.time.monotonic',side_effect=[0,21,21]):
             self.assertEqual(ROSSkills.wait_for_navigation(p,future),'stalled')
         self.assertEqual(calls,['cancel'])
 
